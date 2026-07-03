@@ -96,9 +96,10 @@ def process_job(job: dict, *, device: str | None = None) -> dict:
             if job.get("rvc"):
                 from vocast.rvc.adaptive import adaptive_pitch, median_f0_hz, rvc_direction
                 from vocast.rvc.engine import RvcEngine
+                from vocast.rvc.registry import model_target_f0
                 direction = rvc_direction(params.citizen_voice)
                 f0 = median_f0_hz(tts_path)
-                pitch = adaptive_pitch(f0, direction)
+                pitch = adaptive_pitch(f0, direction, target_f0=model_target_f0(job["rvc_model"]))
                 engine = RvcEngine(job["rvc_model"], device=device, f0up_key=pitch)
                 out_wav = sample_dir / fname
                 engine.convert_file(tts_path, out_wav)
