@@ -67,3 +67,11 @@ def ensure_blend(blend_name: str) -> Path:
 
 def inference_defaults() -> dict:
     return load_models_yaml().get("inference_defaults", {})
+
+
+def model_target_f0(name: str) -> float | None:
+    """모델의 실측 target_f0(Hz), 없으면 None(호출측이 pipeline.yaml 기본값으로 대체).
+    scripts/measure_target_f0.py --write 로 채운다."""
+    cfg = load_models_yaml()
+    meta = cfg.get("models", {}).get(name) or cfg.get("blends", {}).get(name) or {}
+    return meta.get("target_f0")

@@ -1,5 +1,10 @@
 # RVC model registry + optional blends.
 # Place .pth / .index under models/weights/{name}/
+#
+# 선택 필드 target_f0(Hz): 이 화자 학습 코퍼스의 실측 median F0.
+# scripts/measure_target_f0.py --model <name> --corpus <wav폴더> --write 로 채운다.
+# adaptive_pitch()가 있으면 이 값을 우선 쓰고, 없으면 pipeline.yaml의 남/여
+# 두 버킷 기본값(220Hz/140Hz)으로 대체한다.
 
 models:
   typecast_jihoon:

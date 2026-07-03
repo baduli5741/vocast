@@ -26,9 +26,11 @@ def median_f0_hz(path: Path) -> float:
     return float(np.median(v)) if len(v) else 0.0
 
 
-def adaptive_pitch(median_f0: float, direction: str) -> int:
+def adaptive_pitch(median_f0: float, direction: str, *, target_f0: float | None = None) -> int:
+    """target_f0: 실제 타겟 화자에서 실측한 값(권장, registry.model_target_f0 참고).
+    없으면 pipeline.yaml의 남/여 두 버킷 기본값으로 대체(하위 호환)."""
     cfg = _load_pitch_cfg()[direction]
-    target = cfg["target_f0"]
+    target = target_f0 if target_f0 else cfg["target_f0"]
     pmin, pmax = cfg["min"], cfg["max"]
     if median_f0 <= 0:
         return 8 if direction == "male_to_female" else -8

@@ -10,6 +10,8 @@ CONFIG = ROOT / "config"
 sys.path.insert(0, str(ROOT / "src"))
 
 from vocast.region_rules import sample_params  # noqa: E402
+from vocast.rvc.adaptive import adaptive_pitch  # noqa: E402
+from vocast.rvc.registry import model_target_f0  # noqa: E402
 
 
 def _load(name: str) -> dict:
@@ -66,3 +68,19 @@ def test_counselor_voice_seeded_independently_of_citizen_params() -> None:
     """상담원 voice는 seed*7919로 독립 시드 -> 감정 규칙(range/choice/fixed)이 바뀌어도 영향 없음."""
     p = sample_params("강원도", seed=1)
     assert p.counselor_voice == "Hyoeun"
+
+
+def test_adaptive_pitch_prefers_measured_target_over_bucket_default() -> None:
+    """target_f0을 넘기면 pipeline.yaml의 220/140 버킷 기본값 대신 그 값을 쓴다."""
+    bucket_default = adaptive_pitch(125.0, "male_to_female")
+    measured = adaptive_pitch(125.0, "male_to_female", target_f0=125.0)
+    assert measured == 0
+    assert measured != bucket_default
+
+
+def test_adaptive_pitch_falls_back_to_bucket_default_when_no_target_f0() -> None:
+    assert adaptive_pitch(220.0, "male_to_female", target_f0=None) == 0
+
+
+def test_model_target_f0_missing_returns_none() -> None:
+    assert model_target_f0("no-such-model") is None
